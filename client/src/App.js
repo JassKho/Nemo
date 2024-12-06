@@ -11,6 +11,7 @@ function App() {
   const [feedback, setFeedback] = useState("");
   const [winner, setWinner] = useState(null);
   const [isInGame, setIsInGame] = useState(false);
+  const [attempts, setAttempts] = useState([]);
 
   useEffect(() => {
     socket.on('hint', (data) => {
@@ -18,7 +19,7 @@ function App() {
     });
 
     socket.on('winner', (data) => {
-      setWinner(`Le joueur ${data.winner} a trouvé le nombre mystère : ${data.number}!`);
+      setWinner(`Le joueur ${data.winner} a trouvé le nombre mystère ${data.number} en ${data.attempts} tentatives !`);
     });
 
     socket.on('player-joined', ({ playerName }) => {
@@ -50,6 +51,7 @@ function App() {
 
   const handleGuess = () => {
     socket.emit('guess', { gameId, number: parseInt(guess, 10) });
+    setAttempts([...attempts, guess]);
     setGuess("");
   };
 
@@ -90,6 +92,7 @@ function App() {
                 placeholder="Entrez un nombre"
               />
               <button onClick={handleGuess}>Soumettre</button>
+              <p>Tentatives : {attempts.join(", ")}</p>
             </>
           )}
         </>
